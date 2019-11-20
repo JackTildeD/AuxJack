@@ -208,7 +208,7 @@ ffmpeg -i $input_file -ss 00:{start_time} -t 00:{duration} \
                   job = self.job_queue[0]
                else:
                   job = None
-            await asyncio.sleep(0)
+            await asyncio.sleep(0) # Prevent blocking
             if job != None:
                # auxclip job
                if job[0] == "auxclip":

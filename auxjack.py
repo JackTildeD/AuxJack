@@ -72,7 +72,8 @@ class main(discord.Client):
          print("{" + str(args) + "}")
          # Regex for YouTube video IDs
          youtube_id = re.compile(
-            "^[a-zA-Z0-9\-\_]{11}[a-zA-Z0-9\-\_]*$")
+            "^[a-zA-Z0-9\-\_]{11}[a-zA-Z0-9\-\_]*$"
+            )
          # Regex for timecodes
          timecode = re.compile("^\d\d:\d\d$")
          if len(args) != 3:
@@ -85,14 +86,9 @@ class main(discord.Client):
             return True
          for i in range(1, 3):
             args[i] = [int(j) for j in args[i].split(":")]
-         if 60 <= args[1][0]:
-            return True
-         if 60 <= args[1][1]:
-            return True
-         if 60 <= args[2][0]:
-            return True
-         if 60 <= args[2][1]:
-            return True
+            for j in args[i]:
+               if 60 <= j:
+                  return True
          start_seconds = args[1][0] * 60 + args[1][1]
          end_seconds = args[2][0] * 60 + args[2][1]
          duration_seconds = end_seconds - start_seconds
@@ -161,12 +157,13 @@ ls -1 | grep "^video[.][^.]*$" | sed 1q | sed "s|video|clip|"
                )
             print(str(stderr))
             return
-         output_file = stdout
+         output_file = stdout.strip()
+         start_time = args[1]
+         for i in range(1, 3):
+            args[i] = [int(j) for j in args[i].split(":")]
          await asyncio.sleep(0) # Prevent blocking
-         start_seconds = int(args[1].split(":")[0]) * 60
-         start_seconds += int(args[1].split(":")[1])
-         end_seconds = int(args[2].split(":")[0]) * 60
-         end_seconds += int(args[2].split(":")[1])
+         start_seconds = args[1][0] * 60 + args[1][1]
+         end_seconds = args[2][0] * 60 + args[2][1]
          await asyncio.sleep(0) # Prevent blocking
          duration_seconds = end_seconds - start_seconds
          # Duration in string format
@@ -178,7 +175,7 @@ f"""
 cd "{dir}"
 cd "tmp"
 input_file=$(ls -1 | grep "^video[.][^.]*$" | sed 1q)
-ffmpeg -i $input_file -ss 00:{args[1]} -t 00:{duration} \
+ffmpeg -i $input_file -ss 00:{start_time} -t 00:{duration} \
 -async 1 {output_file}
 """)
          if returncode != 0:
